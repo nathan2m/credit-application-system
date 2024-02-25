@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.*
 
 @RestController
 @RequestMapping("/api/customers")
-class CostumerResource(
+class CustomerResource(
     private val customerService: CustomerService
 ) {
     @PostMapping

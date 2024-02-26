@@ -1,6 +1,7 @@
 package _projetos.creditapplicationsystem.service.impl
 
 import _projetos.creditapplicationsystem.entity.Customer
+import _projetos.creditapplicationsystem.exception.BusinessException
 import _projetos.creditapplicationsystem.repository.CustomerRepository
 import _projetos.creditapplicationsystem.service.ICustomerService
 import org.springframework.stereotype.Service
@@ -12,8 +13,11 @@ class CustomerService(
     override fun save(customer: Customer): Customer = this.customerRepository.save(customer)
 
     override fun findById(id: Long): Customer = this.customerRepository.findById(id).orElseThrow {
-        throw RuntimeException("Id $id not found")
+        throw BusinessException("Id $id not found")
     }
 
-    override fun delete(id: Long) = this.customerRepository.deleteById(id)
+    override fun delete(id: Long) {
+        val customer: Customer = this.findById(id)
+        this.customerRepository.delete(customer)
+    }
 }

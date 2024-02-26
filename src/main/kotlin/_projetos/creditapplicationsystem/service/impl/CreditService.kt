@@ -5,6 +5,7 @@ import _projetos.creditapplicationsystem.exception.BusinessException
 import _projetos.creditapplicationsystem.repository.CreditRepository
 import _projetos.creditapplicationsystem.service.ICreditService
 import org.springframework.stereotype.Service
+import java.time.LocalDate
 import java.util.*
 
 @Service
@@ -13,10 +14,16 @@ class CreditService(
     private val customerService: CustomerService
 ): ICreditService {
     override fun save(credit: Credit): Credit {
+        this.validDayFirstInstallment(credit.dayFirstInstallment)
         credit.apply {
             customer = customerService.findById(credit.customer?.id!!)
         }
         return this.creditRepository.save(credit)
+    }
+
+    private fun validDayFirstInstallment(dayFirstInstallment: LocalDate): Boolean {
+        return if (dayFirstInstallment.isBefore(LocalDate.now().plusMonths(3))) true
+        else throw BusinessException("First Installment must be a maximum of 3 months after the current day")
     }
 
     override fun findAllByCustomer(customerId: Long): List<Credit> =

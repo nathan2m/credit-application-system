@@ -88,27 +88,30 @@ class CustomerServiceTest {
         verify(exactly = 1) { customerRepository.delete(fakeCustomer) }
     }
 
-    private fun buildCustomer(
-        firstName: String = "Nathan",
-        lastName: String = "Manera",
-        cpf: String = "28475934625",
-        email: String = "nathan@email.com",
-        password: String = "12345",
-        zipCode: String = "00000-000",
-        street: String = "Rua do Nathan",
-        income: BigDecimal = BigDecimal.valueOf(1000.0),
-        id: Long = 1L
-    ) = Customer(
-        firstName = firstName,
-        lastName = lastName,
-        cpf = cpf,
-        email = email,
-        password = password,
-        address = Address(
-            zipCode = zipCode,
-            street = street,
-        ),
-        income = income,
-        id = id
-    )
+
+    companion object {
+        fun buildCustomer(
+            firstName: String = "Nathan",
+            lastName: String = "Manera",
+            cpf: String = "28475934625",
+            email: String = "nathan@email.com",
+            password: String = "12345",
+            zipCode: String = "00000-000",
+            street: String = "Rua do Nathan",
+            income: BigDecimal = BigDecimal.valueOf(1000.0),
+            id: Long = 1L
+        ) = Customer(
+            firstName = firstName,
+            lastName = lastName,
+            cpf = cpf,
+            email = email,
+            password = password,
+            address = Address(
+                zipCode = zipCode,
+                street = street,
+            ),
+            income = income,
+            id = id
+        )
+    }
 }

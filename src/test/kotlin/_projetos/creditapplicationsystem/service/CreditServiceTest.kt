@@ -20,6 +20,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import java.math.BigDecimal
 import java.time.LocalDate
+import java.util.UUID
 
 @ExtendWith(MockKExtension::class)
 class CreditServiceTest {
@@ -91,6 +92,56 @@ class CreditServiceTest {
         Assertions.assertThat(actual).isSameAs(expectedCredits)
 
         verify(exactly = 1) { creditRepository.findAllByCustomerId(customerId) }
+    }
+
+    @Test
+    fun `should return credit for a valid customer and credit code`() {
+        //given
+        val customerId: Long = 1L
+        val creditCode: UUID = UUID.randomUUID()
+        val credit: Credit = buildCredit(customer = Customer(id = customerId))
+
+        every { creditRepository.findByCreditCode(creditCode) } returns credit
+        //when
+        val actual: Credit = creditService.findByCreditCode(customerId, creditCode)
+        //then
+        Assertions.assertThat(actual).isNotNull
+        Assertions.assertThat(actual).isSameAs(credit)
+
+        verify(exactly = 1) { creditRepository.findByCreditCode(creditCode) }
+    }
+
+    @Test
+    fun `should throw BusinessException for invalid credit code`() {
+        //given
+        val customerId: Long = 1L
+        val invalidCreditCode: UUID = UUID.randomUUID()
+
+        every { creditRepository.findByCreditCode(invalidCreditCode) } returns null
+        //when
+        //then
+        Assertions.assertThatThrownBy { creditService.findByCreditCode(customerId, invalidCreditCode) }
+            .isInstanceOf(BusinessException::class.java)
+            .hasMessage("CreditCode $invalidCreditCode not found")
+        //then
+        verify(exactly = 1) { creditRepository.findByCreditCode(invalidCreditCode) }
+    }
+
+    @Test
+    fun `should throw IllegalArgumentException for different customer ID`() {
+        //given
+        val customerId: Long = 1L
+        val creditCode: UUID = UUID.randomUUID()
+        val credit: Credit = buildCredit(customer = Customer(id = 2L))
+
+        every { creditRepository.findByCreditCode(creditCode) } returns credit
+        //when
+        //then
+        Assertions.assertThatThrownBy { creditService.findByCreditCode(customerId, creditCode) }
+            .isInstanceOf(IllegalArgumentException::class.java)
+            .hasMessage("Contact admin")
+
+        verify { creditRepository.findByCreditCode(creditCode) }
     }
 
     companion object {
